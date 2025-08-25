@@ -71,24 +71,33 @@ public class SAController extends HttpServlet {
 			viewPage = "signup.jsp";
 		
 			
+		// 회원가입 시 아이디 중복체크 
+			
+		} else if (comm.equals("/idCheck.do")) {	
+			
+		String mid = request.getParameter("memberid");
+			
+		if (memberDao.idCheck(mid) == 1) { // 1 이면 아이디 중복!!
+			response.sendRedirect("signup.do?idExists=1");
+		} else {
+			response.sendRedirect("signup.do?idExists=0&memberid=" + mid);
+		}
+			
 		// 회원가입 확인 
-		}else if (comm.equals("/signupOk.do")){ 
-
+		} else if (comm.equals("/signupOk.do")){ 
+			
+		if (Integer.parseInt(request.getParameter("doIdCheck")) == 1) {
+			// 1 이면 아이디 중복 체크함
 			String mid = request.getParameter("memberid");
 			String mpw = request.getParameter("memberpw");
 			String mname = request.getParameter("membername");
 			String memail = request.getParameter("memberemail");
 			
-			int idcheck = memberDao.idCheck(mid);
+			memberDto = memberDao.join(mid, mpw, mname, memail);
+		} else {
+			response.sendRedirect("signup.do?doIdExists=0");
+		}
 			
-			if(idcheck != 1 ) { // 1 이면 아이디 중복 존재
-				
-				memberDto = memberDao.join(mid, mpw, mname, memail);
-
-			} else {
-				response.sendRedirect("signup.do?idExists=1");
-			}
-	
 			
 		// 로그인 화면
 		} else if (comm.equals("/login.do")){ 
@@ -165,57 +174,48 @@ public class SAController extends HttpServlet {
 		// 게시판 페이지 보기 (수강안내) / 모든 게시판 글 보기, 검색한 게시판 글 보기
 		} else if (comm.equals("/guideBoard.do")) {   
 			request.setCharacterEncoding("utf-8");
-	        int page;
+	        int page =1;
 	        
 	        String p = request.getParameter("page");
+	     // 기존 if (searchType != null && (String) searchKeyword.strip() != null && searchKeyword.strip() != "" ) { ... } 를 교체
 	        String searchType = request.getParameter("searchType");
-		    String searchKeyword = request.getParameter("searchKeyword");
-	       
-		    
-	        if (p != null && !p.isBlank()) { // 유저가 보고싶은 페이지 번호를 클릭함
-		        page = Integer.parseInt(p);
-		    } else { 
-		        page = 1;
-		    }
-	        
-		    int listTotal = guideBoardDao.listTotal();
-		    int startPage = (((page - 1) / GuideBoardDao.PAGE_GROUP_SIZE) * GuideBoardDao.PAGE_GROUP_SIZE) + 1;
-		    int endPage = startPage + GuideBoardDao.PAGE_GROUP_SIZE - 1;
-	        
-	        if (searchType != null && (String) searchKeyword.strip() != null ) { // 검색 결과 원하는 경우
-	        	gBDto = guideBoardDao.SearchBoardList(1, searchType, searchKeyword);
-	        	if(!gBDto.isEmpty()) {
-	        		listTotal = gBDto.get(0).getRnum();
-	        		
-	        		gBDto = guideBoardDao.SearchBoardList(page, searchType, searchKeyword);
-			    	request.setAttribute("searchType", searchType);
-			    	request.setAttribute("searchKeyword", searchKeyword);
-	        	} else {
-	        		gBDto = guideBoardDao.guideBoardList(1);
-	        	}
+	        String searchKeyword = request.getParameter("searchKeyword");
+	        searchKeyword = (searchKeyword == null) ? null : searchKeyword.trim();
+
+	        int listTotal;
+
+	        if (searchType != null && searchKeyword != null && !searchKeyword.isBlank()) {
+	            // 총건수는 count 쿼리로
+	            listTotal = guideBoardDao.searchListTotal(searchType, searchKeyword);
+	            gBDto = guideBoardDao.SearchBoardList(page, searchType, searchKeyword);
+
+	            // JSP에서 검색창 값 유지/페이징 파라미터 유지용
+	            request.setAttribute("searchType", searchType);
+	            request.setAttribute("searchKeyword", searchKeyword);
 	        } else {
-	        	request.setAttribute("gBDto", guideBoardDao.guideBoardList(page));
+	            listTotal = guideBoardDao.listTotal();
+	            gBDto = guideBoardDao.guideBoardList(page);
 	        }
-		    
 
-		    
-			int totalPage = (int) Math.ceil((double) listTotal / GuideBoardDao.PAGE_SIZE);
-		    if (totalPage <= 0) totalPage = 1;
-		    if (page < 1) page = 1;
-		    if (page > totalPage) page = totalPage;
-		    
-		    if(endPage > totalPage) {
-		    	endPage = totalPage;
-		    }
-			
-		    request.setAttribute("currentPage", page);       // 유저가 현재 선택한 페이지 번호
-		    request.setAttribute("listTotal", listTotal);
-		    request.setAttribute("totalPage", totalPage);    // 총 글의 갯수로 표현될 전체 페이지의 수
-		    request.setAttribute("startPage", startPage);	// 페이지 그룹 출력 시 첫번째 페이지 번호
-		    request.setAttribute("endPage", endPage); // 페이지 그룹 출력 시 마지막 페이지 번호
+	        // ★ 목록은 한 번만 세팅 (중복 출력 방지)
+	        request.setAttribute("gBDto", gBDto);
 
-		    
-		    viewPage = "guideBoard.jsp";
+	        // 페이징 계산(기존 로직 유지)
+	        int totalPage = (int)Math.ceil((double)listTotal / GuideBoardDao.PAGE_SIZE);
+	        if (totalPage < 1) totalPage = 1;
+	        if (page < 1) page = 1;
+	        if (page > totalPage) page = totalPage;
+
+	        int startPage = (((page - 1) / GuideBoardDao.PAGE_GROUP_SIZE) * GuideBoardDao.PAGE_GROUP_SIZE) + 1;
+	        int endPage = Math.min(startPage + GuideBoardDao.PAGE_GROUP_SIZE - 1, totalPage);
+
+	        request.setAttribute("currentPage", page);
+	        request.setAttribute("listTotal", listTotal);
+	        request.setAttribute("totalPage", totalPage);
+	        request.setAttribute("startPage", startPage);
+	        request.setAttribute("endPage", endPage);
+
+	        viewPage = "guideBoard.jsp";
 		
 		    
 		// 게시판 검색 

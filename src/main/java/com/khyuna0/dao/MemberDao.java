@@ -88,7 +88,7 @@ public class MemberDao {
 	// 회원가입 시 아이디 중복 확인
 	public int idCheck(String mid) {
 		
-		String sql = "SELECT * FROM members WHERE memberid = ? AND memberpw =?";
+		String sql = "SELECT * FROM members WHERE memberid = ?";
 		int sqlResult = 0;
 		
 		try {

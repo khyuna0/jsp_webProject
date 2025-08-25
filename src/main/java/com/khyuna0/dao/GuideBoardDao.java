@@ -37,6 +37,7 @@ public class GuideBoardDao {
 	
 	// 게시판 단순 글쓰기
 	public void guideBoardWrite(String btitle, String memberid, String bcontent) {
+
 		
 		String sql = "INSERT INTO guideboard (btitle, memberid, bcontent, bhit) VALUES (?,?,?,0)";
 
@@ -137,14 +138,13 @@ public class GuideBoardDao {
 	
 	public List<GuideBoardDto> SearchBoardList (int page, String searchType, String searchKeyword) { 
 		
-		String sql =  " SELECT *, ROW_NUMBER() OVER (ORDER BY bnum ASC) AS rnum, "
-		            + "  FROM guideboard "
+		String sql =  " SELECT *, ROW_NUMBER() OVER (ORDER BY bnum ASC) AS rnum "
+		            + " FROM guideboard "
 		            + " WHERE " + searchType + " LIKE ? "
 		            + " ORDER BY rnum DESC "
 		            + " LIMIT ? OFFSET ? ";
 
-		List<GuideBoardDto> searchList = new ArrayList<GuideBoardDto>();
-		int offset = ( page - 1 ) * PAGE_SIZE;
+		int offset = ( page - 1 ) * PAGE_SIZE; 
 		
 		try {
 			Class.forName(drivername); 		
@@ -162,13 +162,13 @@ public class GuideBoardDao {
 				int rnum = rs.getInt("rnum");
 				int bnum = rs.getInt("bnum");
 				String btitle = rs.getString("btitle");
-				String bcontents = rs.getString("bcontents");
+				String bcontent = rs.getString("bcontent");
 				String memberid = rs.getString("memberid");
 				int bhit = rs.getInt("bhit");
 				String bdate = rs.getString("bdate");			
 			
-				guideBoardDto = new GuideBoardDto(rnum, bnum, btitle, bcontents, memberid, bhit, bdate);
-				searchList.add(guideBoardDto);
+				guideBoardDto = new GuideBoardDto(rnum, bnum, btitle, bcontent, memberid, bhit, bdate);
+				GBDto.add(guideBoardDto);
 				
 			}
 			
@@ -192,7 +192,7 @@ public class GuideBoardDao {
 			}
 		}
 		
-		return searchList; // 글들(bDto)이 담긴 boardlist 리스트 반환
+		return GBDto; // 글들(bDto)이 담긴 boardlist 리스트 반환
 	}//
 	
 	
@@ -358,7 +358,46 @@ public class GuideBoardDao {
 		return count;
 	}
 	
-	
+	// 검색한 전체 글 개수 세기
+	public int searchListTotal(String searchType, String searchKeyword) {
+		
+		String sql = "SELECT * FROM guideboard WHERE " +searchType+ " LIKE ? ";
+		int count = 0;
+
+		try {
+			Class.forName(drivername);		
+			conn = DriverManager.getConnection(url, username, password);
+			pstmt = conn.prepareStatement(sql); 
+			
+			pstmt.setString(1, "%" + searchKeyword + "%");
+			rs = pstmt.executeQuery(); 
+		
+		while (rs.next()) {
+			count++;
+		}
+			
+			
+		} catch (Exception e) {
+			
+			System.out.println("DB 에러 발생! 글 개수 불러오기 실패!");
+			e.printStackTrace();
+		} finally { 
+			try {
+				if(rs != null) { 
+					rs.close();
+				}				
+				if(pstmt != null) { 
+					pstmt.close();
+				}				
+				if(conn != null) { 
+					conn.close();
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return count;
+	}
 	
 	
 // --------------- 댓글 ------------------	
