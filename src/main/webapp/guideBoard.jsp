@@ -18,10 +18,10 @@
 
       <div class="board-toolbar">
         <form method="get" action="guideBoard.do" class="board-search" autocomplete="off">
-          <select name="field">
-            <option value="title"   ${field == 'title'   ? 'selected' : ''}>제목</option>
-            <option value="content" ${field == 'content' ? 'selected' : ''}>내용</option>
-            <option value="writer"  ${field == 'writer'  ? 'selected' : ''}>작성자</option>
+          <select name="searchType">
+            <option value="btitle"   ${searchType == 'btitle'   ? 'selected' : ''}>제목</option>
+            <option value="bcontent" ${searchType == 'bcontent' ? 'selected' : ''}>내용</option>
+            <option value="memberid"  ${searchType == 'memberid'  ? 'selected' : ''}>작성자</option>
           </select>
           <input type="text" name="q" value="${q}" placeholder="검색어 입력">
           <button type="submit">검색</button>
@@ -74,10 +74,10 @@
           <c:forEach var="p" begin="${startPage}" end="${endPage}">
           	<c:choose>
 		      	<c:when test="${p == currentPage }"> 
-		      		<a href="guideBoard.do?page=${p}" class="active"><b style="color: navy;">${i}</b></a>
+		      		<a href="guideBoard.do?page=${p}" class="active"><b style="color: navy;">${p}</b></a>
 		      	</c:when>
 		      	<c:otherwise>
-		      		<a href="guideBoard.do?page=${p}" class="active">${i}</a>
+		      		<a href="guideBoard.do?page=${p}" class="active">${p}</a>
 		      	</c:otherwise>	
 		    </c:choose>  
           </c:forEach>
@@ -88,6 +88,7 @@
         <c:if test="${currentPage == totalPage }">
      		 <a href="guideBoard.do?page=${totalPage}">&raquo;</a>
     	</c:if>    
+    	
     	
         </nav>
       </c:if>

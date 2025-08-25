@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -165,8 +166,18 @@ public class SAController extends HttpServlet {
 		} else if (comm.equals("/guideBoard.do")) {   
 			request.setCharacterEncoding("utf-8");
 	        int page;
-
+	        
 	        String p = request.getParameter("page");
+	        String btitle = request.getParameter("btitle");
+	        String bcontent = request.getParameter("bcontent");
+	        String memberid = request.getParameter("memberid");
+	        String q = request.getParameter("q");
+	        
+	        if ( ) {
+	        	
+	        }
+	        
+	        
 		    if (p != null && !p.isBlank()) { // 유저가 보고싶은 페이지 번호를 클릭함
 		        page = Integer.parseInt(p);
 		    } else { 
@@ -190,29 +201,27 @@ public class SAController extends HttpServlet {
 		    request.setAttribute("gBDto", guideBoardDao.guideBoardList(page));
 		    
 		    viewPage = "guideBoard.jsp";
+		
+		    
+		// 게시판 검색 
+		    
+		        
 		    
 		    
-		// 게시판 글 보기	
+		// 선택한 게시판 글 보기	
 		} else if (comm.equals("/guideView.do")) {	
 
 			viewPage = "guideView.jsp";	
-		
+
 		// 게시판 글 리스트에서 선택한 글 보기 처리
 		} else if (comm.equals("/guideViewOk.do")) {	
 			
 			int bnum = Integer.parseInt(request.getParameter("bnum"));
-			System.out.println(bnum);
+			//System.out.println(bnum);
 			guideBoardDto = guideBoardDao.guideBoardView(bnum);
 			request.setAttribute("gview", guideBoardDto);
 
-			response.sendRedirect("guideView.do");
-			return;
-			
-		// 게시판 글 리스트에서 선택한 글 수정 ( 본인이 쓴 글만 가능)	
-		} else if (comm.equals("/guideViewOk.do")) {
-			
-		// 게시판 글 리스트에서 선택한 글 삭제 ( 본인이 쓴 글만 가능)		
-			
+			viewPage = "guideView.do";
 			
 			
 		// 게시판 글 쓰기 화면	
@@ -231,6 +240,37 @@ public class SAController extends HttpServlet {
 			response.sendRedirect("guideBoard.do");
 			return;
 		
+			
+		// 게시판 글 리스트에서 선택한 글 삭제 (본인이 쓴 글만 가능)
+			
+		} else if (comm.equals("/guideDeleteOk.do")) {
+			
+			int bnum = Integer.parseInt(request.getParameter("bnum"));
+			guideBoardDao.boardDelete(bnum);
+
+			viewPage = "guideBoard.do";
+			
+			
+		} else if (comm.equals("/guideBoardModify.do"))	 {
+			
+			int bnum = Integer.parseInt(request.getParameter("bnum"));
+			guideBoardDto = guideBoardDao.guideBoardView(bnum);
+			request.setAttribute("gview", guideBoardDto);
+			
+			viewPage = "guideBoardModify.jsp";
+			
+		// 게시판 글 리스트에서 선택한 글 수정 (본인이 쓴 글만 가능)		
+		} else if (comm.equals("/guideModifyOk.do")) {		
+			
+			int bnum = Integer.parseInt(request.getParameter("bnum"));
+			String btitle = request.getParameter("btitle");
+			String bcontent = request.getParameter("bcontent");
+			guideBoardDao.boardUpdate(bnum, btitle, bcontent);
+	
+			response.sendRedirect("guideViewOk.do?bnum=" + bnum);
+
+			
+			
 		// 댓글 쓰기
 		} else if (comm.equals("/commentOk.do")) {
 			request.setCharacterEncoding("utf-8");

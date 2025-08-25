@@ -30,8 +30,8 @@
       <div class="post-actions">
         <a class="btn" href="guideBoard.do">목록</a>
         <c:if test="${sessionScope.sessionId == gview.memberid || sessionScope.sessionRole == 'ADMIN'}">
-          <a class="btn" href="guideEdit.do?bnum=${gview.bnum}">수정</a>
-          <a class="btn btn-danger" href="guideDelete.do?bnum=${gview.bnum}"
+          <a class="btn" href="guideBoardModify.do?bnum=${gview.bnum}">수정</a>
+          <a class="btn btn-danger" href="guideDeleteOk.do?bnum=${gview.bnum}"
              onclick="return confirm('삭제하시겠습니까?');">삭제</a>
         </c:if>
       </div>

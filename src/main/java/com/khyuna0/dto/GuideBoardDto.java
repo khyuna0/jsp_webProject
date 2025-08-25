@@ -36,15 +36,16 @@ public class GuideBoardDto {
 		this.bhit = bhit;
 		this.bdate = bdate;
 	}
-	public GuideBoardDto(int rnum, String btitle, String bcontent, String memberid, int bhit, String bdate) {
+	public GuideBoardDto(int bnum, String btitle, String bcontent, String memberid, int bhit, String bdate) {
 		super();
-		this.rnum = rnum;
+		this.bnum = bnum;
 		this.btitle = btitle;
 		this.bcontent = bcontent;
 		this.memberid = memberid;
 		this.bhit = bhit;
 		this.bdate = bdate;
 	}
+	
 	public int getRnum() {
 		return rnum;
 	}

@@ -78,9 +78,9 @@ public class GuideBoardDao {
 	// 게시판 글 불러오기
 	public List<GuideBoardDto> guideBoardList(int page) {
 		
-		String sql =	"SELECT ROW_NUMBER() OVER (ORDER BY bnum DESC) AS rnum, " +
-					    "       bnum, btitle, bcontent, memberid, bhit, bdate " +
-					    "  FROM guideBoard " +
+		String sql =	" SELECT ROW_NUMBER() OVER (ORDER BY bnum ASC) AS rnum, " +
+					    " bnum, btitle, bcontent, memberid, bhit, bdate " +
+					    " FROM guideBoard " +
 					    " ORDER BY bnum DESC" +
 					    " LIMIT ? OFFSET ?";
 		
@@ -98,6 +98,8 @@ public class GuideBoardDao {
 			while (rs.next()) { 
 				
 				int rnum = rs.getInt("rnum");
+				
+				int bnum = rs.getInt("bnum");
 				String btitle = rs.getString("btitle");
 				String bcontents = rs.getString("bcontent");
 				String memberid = rs.getString("memberid");
@@ -105,7 +107,7 @@ public class GuideBoardDao {
 				String bdate = rs.getString("bdate");
 				
 				
-				guideBoardDto = new GuideBoardDto(rnum, btitle, bcontents, memberid, bhit, bdate);
+				guideBoardDto = new GuideBoardDto(rnum, bnum, btitle, bcontents, memberid, bhit, bdate);
 				GBDto.add(guideBoardDto);
 			} 
 			
@@ -131,6 +133,70 @@ public class GuideBoardDao {
 		return GBDto;
 	}
 	
+	// 게시판 글 검색
+	
+	public List<GuideBoardDao> SearchBoardList (int page, String searchType, String searchKeyword) { 
+		
+		String sql =  " SELECT ROW_NUMBER() OVER (ORDER BY bnum ASC) AS bno,"
+					+ " B.bnum, B.btitle, B.bcontents, B.memberid, M.memberemail, B.bhit, B.bdate "
+		            + " FROM board "
+		            + " WHERE " + searchType + " LIKE ? "
+		            + " ORDER BY bno DESC "
+		            + " LIMIT ? OFFSET ? ";
+
+		List<GuideBoardDao> searchList = new ArrayList<GuideBoardDao>();
+		int offset = ( page - 1 ) * PAGE_SIZE;
+		
+		try {
+			Class.forName(drivername); 		
+			conn = DriverManager.getConnection(url, username, password);
+			
+			pstmt = conn.prepareStatement(sql); 
+
+			pstmt.setString(1, "%" + searchKeyword + "%");
+			pstmt.setInt(2, PAGE_SIZE);
+			pstmt.setInt(3, offset);
+			rs = pstmt.executeQuery(); 
+			
+			while(rs.next()) { // 성공
+				
+				int rnum = rs.getInt("rnum");
+				int bnum = rs.getInt("bnum");
+				String btitle = rs.getString("btitle");
+				String bcontents = rs.getString("bcontents");
+				String memberid = rs.getString("memberid");
+				int bhit = rs.getInt("bhit");
+				String bdate = rs.getString("bdate");			
+			
+				guideBoardDto = new GuideBoardDto(rnum, bnum, btitle, bcontents, memberid, bhit, bdate);
+				GBDto.add(guideBoardDto);
+				
+			}
+			
+			
+		} catch (Exception e) {
+			System.out.println("DB 에러 발생! 게시판 불러오기 실패");
+			e.printStackTrace();
+		} finally { 
+			try {
+				if(rs != null) { 
+					rs.close();
+				}				
+				if(pstmt != null) { 
+					pstmt.close();
+				}				
+				if(conn != null) { 
+					conn.close();
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return searchList; // 글들(bDto)이 담긴 boardlist 리스트 반환
+	}//
+	
+	
 	// 게시판에서 선택한 글 보기
 	
 	public GuideBoardDto guideBoardView(int num) {
@@ -145,9 +211,8 @@ public class GuideBoardDao {
 			pstmt.setInt(1, num);
 			rs = pstmt.executeQuery(); 
 			
-			while (rs.next()) { 
-				
-				int rnum = rs.getInt("rnum");
+			if (rs.next()) { 
+
 				int bnum = rs.getInt("bnum");
 				String btitle = rs.getString("btitle");
 				String bcontents = rs.getString("bcontent");
@@ -156,7 +221,8 @@ public class GuideBoardDao {
 				String bdate = rs.getString("bdate");
 				
 				
-				guideBoardDto = new GuideBoardDto(rnum, bnum, btitle, bcontents, memberid, bhit, bdate);
+				guideBoardDto = new GuideBoardDto(bnum, btitle, bcontents, memberid, bhit, bdate);
+				
 			} 
 			
 		} catch (Exception e) {
@@ -181,57 +247,29 @@ public class GuideBoardDao {
 		return guideBoardDto;
 	}
 	
-	// 게시판 글 검색하기
 	
-	public List<GuideBoardDto> SearchBoardList(int page, String searchType, String searchKeyword) { 
+	// 게시판 글 수정하기
+	
+	public void boardUpdate (int bnum, String btitle, String bcontent) {
 		
-		String sql =  " SELECT ROW_NUMBER() OVER (ORDER BY bnum ASC) AS bno,"
-					+ " B.bnum, B.btitle, B.bcontents, B.memberid, M.memberemail, B.bhit, B.bdate "
-		            + " FROM board "
-		            + " WHERE " + searchType + " LIKE ? "
-		            + " ORDER BY bno DESC "
-		            + " LIMIT ? OFFSET ? ";
-
-		List<GuideBoardDto> GBList = new ArrayList<GuideBoardDto>();
-		int offset = ( page - 1 ) * PAGE_SIZE;
+		String sql = "UPDATE guideboard SET btitle = ?, bcontent = ? WHERE bnum = ?";
 		
 		try {
-			Class.forName(drivername); 	
+			Class.forName(drivername);			
 			conn = DriverManager.getConnection(url, username, password);
 			
 			pstmt = conn.prepareStatement(sql); 
-
-			pstmt.setString(1, "%" + searchKeyword + "%");
-			pstmt.setInt(2, PAGE_SIZE);
-			pstmt.setInt(3, offset);
-			rs = pstmt.executeQuery(); 
-			
-			while(rs.next()) { // 성공
+			pstmt.setString(1, btitle);
+			pstmt.setString(2, bcontent);
+			pstmt.setInt(3, bnum);
 				
-				int bnum = rs.getInt("bnum");
-				String btitle = rs.getString("btitle");
-				String bcontents = rs.getString("bcontents");
-				String memberid = rs.getString("memberid");
-				int bhit = rs.getInt("bhit");
-				String bdate = rs.getString("bdate");			
-				
-				int bno = rs.getInt("bno");
-				String memberemail = rs.getString("memberemail");
-
-				GuideBoardDto bDto = new GuideBoardDto(bno ,bnum, btitle, bcontents, memberid, bhit, bdate);
-				GBList.add(bDto);
-				
-			}
-			
+			pstmt.executeUpdate(); 
 			
 		} catch (Exception e) {
-			System.out.println("DB 에러 발생! 게시판 글 검색 실패!");
-			e.printStackTrace();
-		} finally { 
+			System.out.println("DB 에러 발생! 글 수정 실패!");
+			e.printStackTrace(); 
+		} finally {  
 			try {
-				if(rs != null) { 
-					rs.close();
-				}				
 				if(pstmt != null) { 
 					pstmt.close();
 				}				
@@ -243,11 +281,42 @@ public class GuideBoardDao {
 			}
 		}
 		
-		return GBList; // 글들(bDto)이 담긴 boardlist 리스트 반환
+	} //
+	
+	// 게시판 글 삭제하기 
+	
+	public void boardDelete(int bnum) {
+		
+		String sql = "DELETE FROM guideboard WHERE bnum = ?";
+		
+		try {
+			Class.forName(drivername);			
+			conn = DriverManager.getConnection(url, username, password);
+			
+			pstmt = conn.prepareStatement(sql); 
+			pstmt.setInt(1, bnum);
+				
+			pstmt.executeUpdate(); 
+			
+		} catch (Exception e) {
+			System.out.println("DB 에러 발생! 글 삭제 실패!");
+			e.printStackTrace(); 
+		} finally {  
+			try {
+				if(pstmt != null) { 
+					pstmt.close();
+				}				
+				if(conn != null) { 
+					conn.close();
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}//
 	
-	
-	
+		
 // ---------- 페이징 ------------
 	
 	// 전체 글 개수 세기
