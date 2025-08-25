@@ -7,9 +7,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NeoCoding Institute</title>
+  <title>Seoul Academy</title>
 </head>
 <body>
+
+ 	<c:if test="${param.logout == '1'}">
+	  <script>
+	    alert('로그아웃 되었습니다.');
+	  </script>
+	</c:if>
+
   <%@ include file="include/header.jsp" %>
 
   <main class="container">

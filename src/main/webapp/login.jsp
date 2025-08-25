@@ -1,14 +1,16 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <html lang="ko">
 <head>
-	<%
-	if (request.getAttribute("sessionId") == null && request.getAttribute("loginFail") != null) { // 웹 서블릿에서 넘겨준 값을 뺄때는 getAttribute 사용
-		String msg = request.getAttribute("loginFail").toString();
-		out.println("<script>alert('" +msg+ "');window.location.href='List.do';</script>");
-	}
+
+	<c:if test="${param.loginfail == '1'}">
+	  <script>
+	    alert('아이디 또는 비밀번호가 일치하지 않습니다.');
+	  </script>
+	</c:if>
 	
-	%>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>로그인 - Seoul Academy</title>

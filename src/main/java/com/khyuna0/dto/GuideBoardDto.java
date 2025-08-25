@@ -1,7 +1,7 @@
 package com.khyuna0.dto;
 
-public class BoardDto {
-	
+public class GuideBoardDto {
+
 	private int rnum;
 	private int bnum;
 	private String btitle;
@@ -10,11 +10,11 @@ public class BoardDto {
 	private int bhit;
 	private String bdate;
 	private MemberDto memberdto;
-	public BoardDto() {
+	public GuideBoardDto() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public BoardDto(int rnum, int bnum, String btitle, String bcontent, String memberid, int bhit, String bdate,
+	public GuideBoardDto(int rnum, int bnum, String btitle, String bcontent, String memberid, int bhit, String bdate,
 			MemberDto memberdto) {
 		super();
 		this.rnum = rnum;
@@ -25,6 +25,25 @@ public class BoardDto {
 		this.bhit = bhit;
 		this.bdate = bdate;
 		this.memberdto = memberdto;
+	}
+	public GuideBoardDto(int rnum, int bnum, String btitle, String bcontent, String memberid, int bhit, String bdate) {
+		super();
+		this.rnum = rnum;
+		this.bnum = bnum;
+		this.btitle = btitle;
+		this.bcontent = bcontent;
+		this.memberid = memberid;
+		this.bhit = bhit;
+		this.bdate = bdate;
+	}
+	public GuideBoardDto(int rnum, String btitle, String bcontent, String memberid, int bhit, String bdate) {
+		super();
+		this.rnum = rnum;
+		this.btitle = btitle;
+		this.bcontent = bcontent;
+		this.memberid = memberid;
+		this.bhit = bhit;
+		this.bdate = bdate;
 	}
 	public int getRnum() {
 		return rnum;
@@ -74,9 +93,5 @@ public class BoardDto {
 	public void setMemberdto(MemberDto memberdto) {
 		this.memberdto = memberdto;
 	}
-	
-	
-	
-	
 	
 }

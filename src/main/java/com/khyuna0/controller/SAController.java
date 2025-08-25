@@ -6,11 +6,18 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import jakarta.servlet.http.HttpSession;
 
-import com.khyuna0.command.joinCommand;
-import com.khyuna0.command.LoginCommand;
-import com.khyuna0.command.SACommand;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.khyuna0.dao.GuideBoardDao;
+import com.khyuna0.dao.MemberDao;
+import com.khyuna0.dto.CommentDto;
+import com.khyuna0.dto.GuideBoardDto;
+import com.khyuna0.dto.MemberDto;
+
 
 /**
  * Servlet implementation class SAController
@@ -46,35 +53,202 @@ public class SAController extends HttpServlet {
 		String comm = uri.substring(conPath.length()); // 최종 요청 값
 		String viewPage = null; // 뷰페이지 설정
 		
-		SACommand command = null;
-		
+		HttpSession session = null;
+		MemberDao memberDao = new MemberDao();
+		MemberDto memberDto = new MemberDto();
+		GuideBoardDao guideBoardDao = new GuideBoardDao();
+		GuideBoardDto guideBoardDto = new GuideBoardDto();
+		List<GuideBoardDto> gBDto = new ArrayList<GuideBoardDto>();
 		
 		// 대문
 		if (comm.equals("/index.do")) { 
 			viewPage = "index.jsp";
 		
+			
 		// 회원가입 화면	
 		} else if (comm.equals("/signup.do")){ 
 			viewPage = "signup.jsp";
 		
+			
 		// 회원가입 확인 
 		}else if (comm.equals("/signupOk.do")){ 
-			// 아이디 중복 체크 선행
-			command = new joinCommand();
-			command.execute(request, response);
-			response.sendRedirect("/login.do");
-			return;
+
+			String mid = request.getParameter("memberid");
+			String mpw = request.getParameter("memberpw");
+			String mname = request.getParameter("membername");
+			String memail = request.getParameter("memberemail");
+			
+			int idcheck = memberDao.idCheck(mid);
+			
+			if(idcheck != 1 ) { // 1 이면 아이디 중복 존재
+				
+				memberDto = memberDao.join(mid, mpw, mname, memail);
+
+			} else {
+				response.sendRedirect("signup.do?idExists=1");
+			}
+	
 			
 		// 로그인 화면
 		} else if (comm.equals("/login.do")){ 
 			viewPage = "login.jsp";
 			
+			
 		// 로그인 확인
 		} else if (comm.equals("/loginOk.do")){ 
-			command = new LoginCommand();
-			command.execute(request, response);
-			response.sendRedirect("/index.do");	
+			String mid = request.getParameter("memberid");
+			String mpw = request.getParameter("memberpw");
+			
+			int loginFlag = memberDao.loginCheck(mid, mpw);
+
+			if (loginFlag == 1) {
+				session = request.getSession();
+				session.setAttribute("sessionId", mid);
+				response.sendRedirect("index.do");
+			} else {
+				response.sendRedirect("login.do?loginfail=1");
+				return;
+			}
+		
+		// 로그아웃	
+		} else if (comm.equals("/logout.do")) {
+			session = request.getSession(false);
+		if (session != null) {
+		    	session.invalidate();   // 세션 전체 삭제
+		}
+			response.sendRedirect("index.do?logout=1");
 			return;
+		
+		
+		// 마이페이지 들어가서 내 정보 보기	
+		} else if (comm.equals("/mypage.do")) {
+			
+			String sid = (String) request.getSession().getAttribute("sessionId"); // 키 이름 확인
+			System.out.println("sid=" + sid);
+			
+			session = request.getSession(false);
+		    if (session == null || session.getAttribute("sessionId") == null) {
+		        response.sendRedirect("login.jsp");
+		        return;
+		    }
+
+		    sid = (String) session.getAttribute("sessionId");
+		    memberDto = memberDao.mypage(sid);  
+		    request.setAttribute("memberDto", memberDto); 
+		    viewPage = "mypage.jsp";
+		
+		    
+		// 회원 정보 수정하기
+		} else if (comm.equals("/mypageOk.do")) {
+			
+			String mpw = null;
+			
+			session = request.getSession(false);
+			String sid = (String) session.getAttribute("sessionId");			
+			
+			mpw = request.getParameter("memberpw");
+			if (mpw == null || mpw.trim().isEmpty()) {
+			    mpw = request.getParameter("oldpw"); // 기존 값 유지
+			}
+			
+			String mname = request.getParameter("membername");
+			String memail = request.getParameter("memberemail");
+			
+			memberDao.mypageModify(mpw, mname, memail, sid);
+			response.sendRedirect("mypage.do");
+
+	        return;
+
+//---------------------	 수강 안내 게시판  --------------------------	        
+		
+		// 게시판 페이지 보기 (수강안내) / 모든 게시판 글 보기
+		} else if (comm.equals("/guideBoard.do")) {   
+			request.setCharacterEncoding("utf-8");
+	        int page;
+
+	        String p = request.getParameter("page");
+		    if (p != null && !p.isBlank()) { // 유저가 보고싶은 페이지 번호를 클릭함
+		        page = Integer.parseInt(p);
+		    } else { 
+		        page = 1;
+		    }
+		    
+		    int listTotal = guideBoardDao.listTotal();
+		    int startPage = (((page - 1) / GuideBoardDao.PAGE_GROUP_SIZE) * GuideBoardDao.PAGE_GROUP_SIZE) + 1;
+		    int endPage = startPage + GuideBoardDao.PAGE_GROUP_SIZE - 1;
+			int totalPage = (int) Math.ceil((double) listTotal / GuideBoardDao.PAGE_SIZE);
+			
+		    if (totalPage <= 0) totalPage = 1;
+		    if (page < 1) page = 1;
+		    if (page > totalPage) page = totalPage;
+			
+		    request.setAttribute("currentPage", page);       // 유저가 현재 선택한 페이지 번호
+		    request.setAttribute("listTotal", listTotal);
+		    request.setAttribute("totalPage", totalPage);    // 총 글의 갯수로 표현될 전체 페이지의 수
+		    request.setAttribute("startPage", startPage);	// 페이지 그룹 출력 시 첫번째 페이지 번호
+		    request.setAttribute("endPage", endPage); // 페이지 그룹 출력 시 마지막 페이지 번호
+		    request.setAttribute("gBDto", guideBoardDao.guideBoardList(page));
+		    
+		    viewPage = "guideBoard.jsp";
+		    
+		    
+		// 게시판 글 보기	
+		} else if (comm.equals("/guideView.do")) {	
+
+			viewPage = "guideView.jsp";	
+		
+		// 게시판 글 리스트에서 선택한 글 보기 처리
+		} else if (comm.equals("/guideViewOk.do")) {	
+			
+			int bnum = Integer.parseInt(request.getParameter("bnum"));
+			System.out.println(bnum);
+			guideBoardDto = guideBoardDao.guideBoardView(bnum);
+			request.setAttribute("gview", guideBoardDto);
+
+			response.sendRedirect("guideView.do");
+			return;
+			
+		// 게시판 글 리스트에서 선택한 글 수정 ( 본인이 쓴 글만 가능)	
+		} else if (comm.equals("/guideViewOk.do")) {
+			
+		// 게시판 글 리스트에서 선택한 글 삭제 ( 본인이 쓴 글만 가능)		
+			
+			
+			
+		// 게시판 글 쓰기 화면	
+		} else if (comm.equals("/guideBoardWrite.do")) {
+			viewPage = "guideBoardWrite.jsp";
+			
+			
+		// 글 쓰기 처리	
+		} else if (comm.equals("/guideBoardWriteOk.do")) {	
+			
+			String btitle = request.getParameter("btitle");
+			String memberid = request.getParameter("memberid");
+			String bcontent = request.getParameter("bcontent");
+			
+			guideBoardDao.guideBoardWrite(btitle, memberid, bcontent);
+			response.sendRedirect("guideBoard.do");
+			return;
+		
+		// 댓글 쓰기
+		} else if (comm.equals("/commentOk.do")) {
+			request.setCharacterEncoding("utf-8");
+			
+			String bnum = request.getParameter("bnum");
+			String comment = request.getParameter("comment");
+			
+			session = request.getSession(false);
+			String memberid = (String) session.getAttribute("sessionId");
+			guideBoardDao.commentWrite(bnum, memberid, comment);
+			
+			List<CommentDto> commentDtos = new ArrayList<CommentDto>();
+			commentDtos = guideBoardDao.commentList(Integer.parseInt(bnum));
+			
+			request.setAttribute("commentDtos", commentDtos);
+			response.sendRedirect("guideView.do?bnum="+bnum);
+			return;
+			
 			
 		// 기본 고정 인덱스 페이지 	
 		}else {
