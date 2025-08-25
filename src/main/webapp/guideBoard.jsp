@@ -23,7 +23,7 @@
             <option value="bcontent" ${searchType == 'bcontent' ? 'selected' : ''}>내용</option>
             <option value="memberid"  ${searchType == 'memberid'  ? 'selected' : ''}>작성자</option>
           </select>
-          <input type="text" name="q" value="${q}" placeholder="검색어 입력">
+          <input type="text" name="searchKeyword" value="${searchKeyword != null ? searchKeyword : ''}" placeholder="검색어 입력">
           <button type="submit">검색</button>
         </form>
 

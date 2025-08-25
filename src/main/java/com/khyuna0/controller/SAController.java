@@ -162,43 +162,58 @@ public class SAController extends HttpServlet {
 
 //---------------------	 수강 안내 게시판  --------------------------	        
 		
-		// 게시판 페이지 보기 (수강안내) / 모든 게시판 글 보기
+		// 게시판 페이지 보기 (수강안내) / 모든 게시판 글 보기, 검색한 게시판 글 보기
 		} else if (comm.equals("/guideBoard.do")) {   
 			request.setCharacterEncoding("utf-8");
 	        int page;
 	        
 	        String p = request.getParameter("page");
-	        String btitle = request.getParameter("btitle");
-	        String bcontent = request.getParameter("bcontent");
-	        String memberid = request.getParameter("memberid");
-	        String q = request.getParameter("q");
-	        
-	        if ( ) {
-	        	
-	        }
-	        
-	        
-		    if (p != null && !p.isBlank()) { // 유저가 보고싶은 페이지 번호를 클릭함
+	        String searchType = request.getParameter("searchType");
+		    String searchKeyword = request.getParameter("searchKeyword");
+	       
+		    
+	        if (p != null && !p.isBlank()) { // 유저가 보고싶은 페이지 번호를 클릭함
 		        page = Integer.parseInt(p);
 		    } else { 
 		        page = 1;
 		    }
-		    
+	        
 		    int listTotal = guideBoardDao.listTotal();
 		    int startPage = (((page - 1) / GuideBoardDao.PAGE_GROUP_SIZE) * GuideBoardDao.PAGE_GROUP_SIZE) + 1;
 		    int endPage = startPage + GuideBoardDao.PAGE_GROUP_SIZE - 1;
+	        
+	        if (searchType != null && (String) searchKeyword.strip() != null ) { // 검색 결과 원하는 경우
+	        	gBDto = guideBoardDao.SearchBoardList(1, searchType, searchKeyword);
+	        	if(!gBDto.isEmpty()) {
+	        		listTotal = gBDto.get(0).getRnum();
+	        		
+	        		gBDto = guideBoardDao.SearchBoardList(page, searchType, searchKeyword);
+			    	request.setAttribute("searchType", searchType);
+			    	request.setAttribute("searchKeyword", searchKeyword);
+	        	} else {
+	        		gBDto = guideBoardDao.guideBoardList(1);
+	        	}
+	        } else {
+	        	request.setAttribute("gBDto", guideBoardDao.guideBoardList(page));
+	        }
+		    
+
+		    
 			int totalPage = (int) Math.ceil((double) listTotal / GuideBoardDao.PAGE_SIZE);
-			
 		    if (totalPage <= 0) totalPage = 1;
 		    if (page < 1) page = 1;
 		    if (page > totalPage) page = totalPage;
+		    
+		    if(endPage > totalPage) {
+		    	endPage = totalPage;
+		    }
 			
 		    request.setAttribute("currentPage", page);       // 유저가 현재 선택한 페이지 번호
 		    request.setAttribute("listTotal", listTotal);
 		    request.setAttribute("totalPage", totalPage);    // 총 글의 갯수로 표현될 전체 페이지의 수
 		    request.setAttribute("startPage", startPage);	// 페이지 그룹 출력 시 첫번째 페이지 번호
 		    request.setAttribute("endPage", endPage); // 페이지 그룹 출력 시 마지막 페이지 번호
-		    request.setAttribute("gBDto", guideBoardDao.guideBoardList(page));
+
 		    
 		    viewPage = "guideBoard.jsp";
 		

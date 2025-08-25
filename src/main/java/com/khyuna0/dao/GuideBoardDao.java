@@ -135,16 +135,15 @@ public class GuideBoardDao {
 	
 	// 게시판 글 검색
 	
-	public List<GuideBoardDao> SearchBoardList (int page, String searchType, String searchKeyword) { 
+	public List<GuideBoardDto> SearchBoardList (int page, String searchType, String searchKeyword) { 
 		
-		String sql =  " SELECT ROW_NUMBER() OVER (ORDER BY bnum ASC) AS bno,"
-					+ " B.bnum, B.btitle, B.bcontents, B.memberid, M.memberemail, B.bhit, B.bdate "
-		            + " FROM board "
+		String sql =  " SELECT *, ROW_NUMBER() OVER (ORDER BY bnum ASC) AS rnum, "
+		            + "  FROM guideboard "
 		            + " WHERE " + searchType + " LIKE ? "
-		            + " ORDER BY bno DESC "
+		            + " ORDER BY rnum DESC "
 		            + " LIMIT ? OFFSET ? ";
 
-		List<GuideBoardDao> searchList = new ArrayList<GuideBoardDao>();
+		List<GuideBoardDto> searchList = new ArrayList<GuideBoardDto>();
 		int offset = ( page - 1 ) * PAGE_SIZE;
 		
 		try {
@@ -169,7 +168,7 @@ public class GuideBoardDao {
 				String bdate = rs.getString("bdate");			
 			
 				guideBoardDto = new GuideBoardDto(rnum, bnum, btitle, bcontents, memberid, bhit, bdate);
-				GBDto.add(guideBoardDto);
+				searchList.add(guideBoardDto);
 				
 			}
 			
