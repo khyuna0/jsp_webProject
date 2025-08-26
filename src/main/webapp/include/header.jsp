@@ -13,8 +13,7 @@
       <!-- 네비게이션 -->
 		<nav class="main-nav">
 		  <a href="<c:url value='/index.do'/>">홈</a>
-		  <a href="<c:url value='/guideBoard.do'/>">수강안내 게시판</a>
-		  <a href="<c:url value='/reviewBoard.do'/>">수강생 후기</a>
+		  <a href="<c:url value='/guideBoard.do'/>">수강안내</a>
 		
 		  <c:choose>
 		    <c:when test="${not empty sessionScope.sessionId}">

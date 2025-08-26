@@ -6,11 +6,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>수강안내 글쓰기 - Seoul Academy</title>
-  <link rel="stylesheet" href="css/style.css?v=fix1">
+  <link rel="stylesheet" href="../css/style.css?v=fix1">
 
 </head>
 <body>
-  <%@ include file="include/header.jsp" %>
+  <%@ include file="../include/header.jsp" %>
 
 	<c:if test="${empty sessionScope.sessionId}">
 	  <script>
@@ -51,6 +51,6 @@
     </section>
   </main>
 
-  <%@ include file="include/footer.jsp" %>
+  <%@ include file="../include/footer.jsp" %>
 </body>
 </html>

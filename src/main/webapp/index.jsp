@@ -20,8 +20,19 @@
   <%@ include file="include/header.jsp" %>
 
 <!-- 학원 홍보 배너 (배경 클릭 시 수강안내 게시판으로 이동) -->
-<section class="index-hero">
-  <a class="hero-link" href="guideBoard.do" aria-label="수강안내 게시판 바로가기"></a>
+ <section class="index-hero">
+  	<a class="hero-link" href="guideBoard.do" aria-label="수강안내 게시판 바로가기"></a>
+ </section>
+
+
+<!-- 광고 배너 (index 메인 아래) -->
+<section class="section">
+  <div class="container">
+    <div class="card" style="padding:0;overflow:hidden;">
+      <img src="img/promo_banner.png" alt="Seoul Academy 광고 배너" 
+           style="width:100%;height:100%;object-fit:cover;">
+    </div>
+  </div>
 </section>
 
 <!-- 수강생 후기 섹션: 테이블 제목 클릭 시 reviewBoard.do 이동 -->
@@ -30,7 +41,7 @@
     <div class="card">
       <div class="board-toolbar">
         <h2 class="auth-title" style="margin:0;">
-          <a href="reviewBoard.do" class="title-cell">수강생 후기</a>
+          <a href="reviewBoard.do" class="title-cell">수강 안내</a>
         </h2>
       </div>
 
@@ -46,16 +57,16 @@
             </tr>
           </thead>
           <tbody>
-            <c:if test="${empty reviewList}">
+            <c:if test="${empty gBDto}">
               <tr><td colspan="5" class="muted" style="text-align:center;">후기가 없습니다.</td></tr>
             </c:if>
-            <c:forEach var="r" items="${reviewList}">
+            <c:forEach var="b" items="${gBDto}">
               <tr>
-                <td>${r.rnum}</td>
-                <td class="title-cell"><a href="reviewView.do?bnum=${r.bnum}">${r.btitle}</a></td>
-                <td>${r.memberid}</td>
-                <td>${r.bdate}</td>
-                <td>${r.bhit}</td>
+                <td>${b.rnum}</td>
+                <td class="title-cell"><a href="guideViewOk.do?bnum=${b.bnum}">${b.btitle}</a></td>
+                <td>${b.memberid}</td>
+                <td>${b.bdate}</td>
+                <td>${b.bhit}</td>
               </tr>
             </c:forEach>
           </tbody>

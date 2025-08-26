@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>수강안내 게시판 - Seoul Academy</title>
-  <link rel="stylesheet" href="css/style.css?v=fix">
+<link rel="stylesheet" href="<c:url value='/css/style.css?v=fix'/>">
 </head>
 <body>
 
@@ -16,7 +16,7 @@
 	  </script>
 	</c:if>
 
-<%@ include file="include/header.jsp" %>
+<%@ include file="/include/header.jsp" %>
 
 <main class="container">
   <section class="section">
@@ -117,6 +117,6 @@
   </section>
 </main>
 
-<%@ include file="include/footer.jsp" %>
+<%@ include file="/include/footer.jsp" %>
 </body>
 </html>
