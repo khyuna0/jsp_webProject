@@ -252,61 +252,6 @@ public class MemberDao {
 		}	
 	}//
 	
-	
-	//게시판 글 쓰기
-	public MemberDto guideBoardWrite(String memberid, String memberpw, String membername,String memberemail) {
-		
-		String sql = "INSERT INTO guideboard (memberid,memberpw,membername,memberemail) VALUES (?,?,?,?)";
-		
-		LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String nowString = now.format(formatter);
 
-		try {
-			Class.forName(drivername);		
-			conn = DriverManager.getConnection(url, username, password);
-			
-			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1, memberid);
-			pstmt.setString(2, memberpw);
-			pstmt.setString(3, membername);
-			pstmt.setString(4, memberemail);
-			
-			int sqlResult = pstmt.executeUpdate(); 
-			
-			if ( sqlResult == SUCCESS ) { 
-
-				memberDto.setMemberid(memberid);
-				memberDto.setMemberpw(memberpw);
-				memberDto.setMembername(membername);
-				memberDto.setMemberemail(memberemail);
-				memberDto.setMemberdate(nowString);
-
-			}
-			
-		} catch (Exception e) {
-			
-			System.out.println("DB 에러 발생! 회원가입 실패");
-			e.printStackTrace();
-		} finally { 
-			try {
-				if(rs != null) { 
-					rs.close();
-				}				
-				if(pstmt != null) { 
-					pstmt.close();
-				}				
-				if(conn != null) { 
-					conn.close();
-				}
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return memberDto;
-	}//
-
-	
 }
 

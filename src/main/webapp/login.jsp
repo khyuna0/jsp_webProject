@@ -41,13 +41,8 @@
         <button type="submit" class="btn btn-primary" style="flex:1;">로그인</button>
         <a class="btn" href="signup.jsp">회원가입</a>
       </div>
-      <p class="hint">성공 시 sessionScope.loginUser 에 사용자 정보를 저장하세요.</p>
     </form>
 
-    <div class="auth-footer">
-      <span>비밀번호를 잊으셨나요?</span>
-      <a href="#">비밀번호 재설정</a>
-    </div>
   </section>
 
   <%@ include file="include/footer.jsp" %>

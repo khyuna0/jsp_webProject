@@ -28,27 +28,32 @@
 	<form class="form" action="signupOk.do" method="post" autocomplete="off">
   <!-- 아이디 -->
   <div class="form-row">
-    <label for="memberid">아이디</label>
-    <div style="display:flex; gap:8px;">
-      <input type="text" id="memberid" name="memberid" value="${param.idExists == '0' ? param.memberid : ''}" minlength="4" maxlength="20" style="flex:1;">
+  <label for="memberid">아이디</label>
+  <div style="display:flex; gap:8px;">
+    <!-- 중복 아님이면 값 유지, 중복이면 공백 -->
+    <input type="text" id="memberid" name="memberid"
+           value="${param.idExists eq '0' ? param.memberid : ''}"
+           required minlength="4" maxlength="20" style="flex:1;">
 
-      <button type="submit"
-              class="btn btn-check"
-              formaction="idCheck.do?"
-              formmethod="get">
-        중복확인
-      </button>
-      
-    <c:if test="${param.idExists == '1'}">
-		<script>alert('중복된 아이디입니다!');</script>
-	</c:if>
-	<c:if test="${param.idExists == '0'}">
-		<script>alert('사용 가능한 아이디입니다!');</script>
-	</c:if>
-      
-    </div>
-    <p class="hint">영문/숫자 4~20자</p>
+    <button type="submit"
+            class="btn btn-check"
+            formaction="idCheck.do"
+            formmethod="get"
+            formnovalidate>
+      중복확인
+    </button>
   </div>
+
+  <!-- 상태 메시지 -->
+  <c:if test="${param.idExists eq '1'}">
+    <p style="color:red;">중복된 아이디입니다. 다시 입력하세요.</p>
+    <script>alert('중복된 아이디입니다!');</script>
+  </c:if>
+  <c:if test="${param.idExists eq '0'}">
+    <p style="color:green;">사용 가능한 아이디입니다.</p>
+  </c:if>
+</div>
+
 
   <!-- 나머지 필드 (변수명 유지) -->
   <div class="form-row">
@@ -67,7 +72,7 @@
   </div>
 
   <div class="form-actions">
-    <input type="submit" class="btn btn-primary" style="flex:1;">가입하기
+    <input type="submit"  value = "가입하기" class="btn btn-primary" style="flex:1;">
     <a class="btn" href="login.do">로그인</a>
   </div>
 </form>

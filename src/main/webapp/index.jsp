@@ -19,18 +19,52 @@
 
   <%@ include file="include/header.jsp" %>
 
-  <main class="container">
-    <section class="section">
-      <div class="card">
-        <h2>안내</h2>
-        <h2> </h2>
-        <p class="muted">상단 메뉴에서 수강안내/후기 게시판으로 이동하세요. 로그인 사용자만 글쓰기 가능.</p>
-        <div style="margin-top:14px;">
-          <a class="btn btn-primary" href="<%=request.getContextPath()%>/guideBoard.jsp">수강안내 바로가기</a>
-          <a class="btn" href="<%=request.getContextPath()%>/reviewBoard.jsp" style="margin-left:8px;">수강생 후기</a>
-        </div>
+<!-- 학원 홍보 배너 (배경 클릭 시 수강안내 게시판으로 이동) -->
+<section class="index-hero">
+  <a class="hero-link" href="guideBoard.do" aria-label="수강안내 게시판 바로가기"></a>
+</section>
+
+<!-- 수강생 후기 섹션: 테이블 제목 클릭 시 reviewBoard.do 이동 -->
+<section class="section">
+  <div class="container">
+    <div class="card">
+      <div class="board-toolbar">
+        <h2 class="auth-title" style="margin:0;">
+          <a href="reviewBoard.do" class="title-cell">수강생 후기</a>
+        </h2>
       </div>
-    </section>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width:80px">번호</th>
+              <th>제목</th>
+              <th style="width:160px">작성자</th>
+              <th style="width:180px">작성일</th>
+              <th style="width:100px">조회수</th>
+            </tr>
+          </thead>
+          <tbody>
+            <c:if test="${empty reviewList}">
+              <tr><td colspan="5" class="muted" style="text-align:center;">후기가 없습니다.</td></tr>
+            </c:if>
+            <c:forEach var="r" items="${reviewList}">
+              <tr>
+                <td>${r.rnum}</td>
+                <td class="title-cell"><a href="reviewView.do?bnum=${r.bnum}">${r.btitle}</a></td>
+                <td>${r.memberid}</td>
+                <td>${r.bdate}</td>
+                <td>${r.bhit}</td>
+              </tr>
+            </c:forEach>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
   </main>
 
   <%@ include file="include/footer.jsp" %>

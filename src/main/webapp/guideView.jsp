@@ -46,17 +46,17 @@
       <c:forEach var="c" items="${comments}">
         <div class="comment">
           <div class="comment-meta">
-            <span class="comment-writer">${c.writer}</span>
-            <span class="comment-date">${c.regdate}</span>
+            <span class="comment-writer">${c.memberid}</span>
+            <span class="comment-date">${c.cdate}</span>
           </div>
-          <div class="comment-content"><c:out value="${c.content}"/></div>
+          <div class="comment-content"><c:out value="${c.comment}"/></div>
         </div>
       </c:forEach>
 
       <c:if test="${not empty sessionScope.sessionId}">
-        <form class="comment-form" action="commentWrite.do" method="post">
+        <form class="comment-form" action="commentOk.do" method="post">
           <input type="hidden" name="bnum" value="${gview.bnum}">
-          <div class="form-row"><textarea name="content" placeholder="댓글을 입력하세요" required></textarea></div>
+          <div class="form-row"><textarea name="comment" placeholder="댓글을 입력하세요" required></textarea></div>
           <div class="form-actions"><button type="submit" class="btn btn-primary">등록</button></div>
         </form>
       </c:if>

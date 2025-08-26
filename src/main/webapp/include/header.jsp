@@ -18,7 +18,7 @@
 		
 		  <c:choose>
 		    <c:when test="${not empty sessionScope.sessionId}">
-		      <span class="nav-text"> ${sessionScope.sessionId} 님 환영합니다.</span>
+		      <span class="nav-text">${sessionScope.sessionId} 님 환영합니다.</span>
 		      <a href="<c:url value='/logout.do'/>">로그아웃</a>
 		      <a href="<c:url value='/mypage.do'/>">내 정보</a>
 		    </c:when>

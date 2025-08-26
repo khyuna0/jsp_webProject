@@ -28,7 +28,7 @@
           <select name="searchType">
             <option value="btitle"   ${searchType == 'btitle'   ? 'selected' : ''}>제목</option>
             <option value="bcontent" ${searchType == 'bcontent' ? 'selected' : ''}>내용</option>
-            <option value="memberid"  ${searchType == 'memberid'  ? 'selected' : ''}>작성자</option>
+            <option value="memberid" ${searchType == 'memberid' ? 'selected' : ''}>작성자</option>
           </select>
           <input type="text" name="searchKeyword" value="${searchKeyword != null ? searchKeyword : ''}" placeholder="검색어 입력">
           <button type="submit">검색</button>
@@ -72,35 +72,45 @@
         <nav class="pagination">
         
         <c:if test="${currentPage > 1 }">
-      		<a href="guideBoard.do?page=${1 }&searchType=${searchType}&searchKeyword=${searchKeyword}">첫 번째 글</a>
+      		<a href="guideBoard.do?page=1&searchType=${searchType}&searchKeyword=${searchKeyword}">첫 번째 글</a>
     	</c:if> 
         
-          <a class="page ${startPage == 1 ? 'disabled' : ''}"
-             href="guideBoard.do?page=${startPage-1}&searchType=${searchType}&searchKeyword=${searchKeyword}">이전</a>
+          <c:choose>
+            <c:when test="${startPage == 1}">
+              <span class="page disabled">이전</span>
+            </c:when>
+            <c:otherwise>
+              <a class="page" href="guideBoard.do?page=${startPage-1}&searchType=${searchType}&searchKeyword=${searchKeyword}">이전</a>
+            </c:otherwise>
+          </c:choose>
 
           <c:forEach var="p" begin="${startPage}" end="${endPage}">
           	<c:choose>
-		      	<c:when test="${p == currentPage }"> 
-		      		<a href="guideBoard.do?page=${p}&searchType=${searchType}&searchKeyword=${searchKeyword}" class="active"><b style="color: navy;">${p}</b></a>
-		      	</c:when>
+		      	<c:when test="${p == currentPage}">
+		      	<!-- 현재:${currentPage}, p:${p} -->
+				  	<span class="page active">${p}</span>
+				</c:when>
 		      	<c:otherwise>
-		      		<a href="guideBoard.do?page=${p}&searchType=${searchType}&searchKeyword=${searchKeyword}" class="active">${p}</a>
+		      		<a class="page" href="guideBoard.do?page=${p}&searchType=${searchType}&searchKeyword=${searchKeyword}">${p}</a>
 		      	</c:otherwise>	
 		    </c:choose>  
           </c:forEach>
 
-          <a class="page ${endPage == totalPage ? 'disabled' : ''}"
-             href="guideBoard.do?page=${endPage+1}&searchType=${searchType}&searchKeyword${searchKeyword}">다음</a>
+          <c:choose>
+            <c:when test="${endPage == totalPage}">
+              <span class="page disabled">다음</span>
+            </c:when>
+            <c:otherwise>
+              <a class="page" href="guideBoard.do?page=${endPage+1}&searchType=${searchType}&searchKeyword=${searchKeyword}">다음</a>
+            </c:otherwise>
+          </c:choose>
              
         <c:if test="${currentPage != totalPage }">
-     		 <a href="guideBoard.do?page=${totalPage}&searchType=${searchType}&searchKeyword${searchKeyword}">마지막 글</a>
-    	</c:if>    
-    	
+     		 <a href="guideBoard.do?page=${totalPage}&searchType=${searchType}&searchKeyword=${searchKeyword}">마지막 글</a>
+   	 	</c:if>    
     	
         </nav>
       </c:if>
-	
-	
 	
       <p class="muted" style="margin-top:8px;">총 ${listTotal}건</p>
     </div>

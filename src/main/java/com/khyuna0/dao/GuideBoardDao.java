@@ -246,6 +246,42 @@ public class GuideBoardDao {
 		return guideBoardDto;
 	}
 	
+	// 게시판 글 조회수
+	
+	public void guideBoardHit(int num) {
+		
+		String sql = "UPDATE guideBoard SET bhit = bhit+1 WHERE bnum = ?";
+
+		try {
+			Class.forName(drivername);		
+			conn = DriverManager.getConnection(url, username, password);
+			
+			pstmt = conn.prepareStatement(sql); 
+			pstmt.setInt(1, num);
+			pstmt.executeUpdate(); 
+			
+			
+		} catch (Exception e) {
+			
+			System.out.println("DB 에러 발생! 조회수 처리 실패");
+			e.printStackTrace();
+		} finally { 
+			try {
+				if(rs != null) { 
+					rs.close();
+				}				
+				if(pstmt != null) { 
+					pstmt.close();
+				}				
+				if(conn != null) { 
+					conn.close();
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	
 	// 게시판 글 수정하기
 	
