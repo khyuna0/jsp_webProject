@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>글 수정 - Seoul Academy</title>
-  <!-- 전역 스타일 안에 edit-page 규칙도 포함됨 -->
+
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="edit-page">
