@@ -72,19 +72,19 @@
         <nav class="pagination">
         
         <c:if test="${currentPage > 1 }">
-      		<a href="guideBoard.do?page=${1 }&searchType=${searchType}&searchKeyword${searchKeyword}">첫 번째 글</a>
+      		<a href="guideBoard.do?page=${1 }&searchType=${searchType}&searchKeyword=${searchKeyword}">첫 번째 글</a>
     	</c:if> 
         
           <a class="page ${startPage == 1 ? 'disabled' : ''}"
-             href="guideBoard.do?page=${startPage-1}&searchType=${searchType}&searchKeyword${searchKeyword}">이전</a>
+             href="guideBoard.do?page=${startPage-1}&searchType=${searchType}&searchKeyword=${searchKeyword}">이전</a>
 
           <c:forEach var="p" begin="${startPage}" end="${endPage}">
           	<c:choose>
 		      	<c:when test="${p == currentPage }"> 
-		      		<a href="guideBoard.do?page=${p}&searchType=${searchType}&searchKeyword${searchKeyword}" class="active"><b style="color: navy;">${p}</b></a>
+		      		<a href="guideBoard.do?page=${p}&searchType=${searchType}&searchKeyword=${searchKeyword}" class="active"><b style="color: navy;">${p}</b></a>
 		      	</c:when>
 		      	<c:otherwise>
-		      		<a href="guideBoard.do?page=${p}&searchType=${searchType}&searchKeyword${searchKeyword}" class="active">${p}</a>
+		      		<a href="guideBoard.do?page=${p}&searchType=${searchType}&searchKeyword=${searchKeyword}" class="active">${p}</a>
 		      	</c:otherwise>	
 		    </c:choose>  
           </c:forEach>
